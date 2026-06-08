@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ title }}</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header>
+  <h1>💬 {{ title }}</h1>
+  <div class="status">
+    {% if agent_configured %}
+      <span class="dot green"></span> Agent 연결됨
+    {% else %}
+      <span class="dot red"></span> AGENT_RUNTIME_ARN 미설정
+    {% endif %}
+  </div>
+</header>
+
+<main id="chat">
+  <div id="messages"></div>
+  <div id="composer">
+    <textarea id="input" rows="2" placeholder="메시지를 입력하세요 — Enter 전송, Shift+Enter 줄바꿈"></textarea>
+    <button id="send">전송</button>
+    <button id="new-session" title="대화 초기화">↻</button>
+  </div>
+</main>
+
+<footer>
+  <small>AAH Code Deploy Sample · UI + Agent (직접 개발) · Powered by Bedrock AgentCore Runtime</small>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

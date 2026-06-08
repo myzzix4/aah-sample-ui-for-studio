@@ -1,0 +1,47 @@
+# AAH Deployment Manifest — UI for Studio Agent/Team (sample #2 & #3)
+#
+# UI 단독 서비스. Agent 또는 Team 은 AAH Studio 에서 만든 결과물의 ARN 을
+# `AGENT_RUNTIME_ARN` 으로 박음. 외부 ARN 호출만 하면 되니 컨테이너 코드는
+# Agent / Team 어느 쪽이든 동일.
+#
+# 사용:
+#   #2 UI + Studio Agent  → AGENT_RUNTIME_ARN = Studio Agent baked ARN
+#   #3 UI + Studio Team   → AGENT_RUNTIME_ARN = Studio Team baked ARN
+#
+# 둘 다 invoke_agent_runtime 으로 동일 호출 — Anthropic native tool_use 등
+# 컨테이너 내부 동작은 Studio 결과물이 결정.
+
+apiVersion: aah.dev/v1
+kind: AgentDeployment
+
+metadata:
+  name: aah-sample-ui-for-studio
+  display_name: UI for Studio Agent/Team
+  description: |
+    Flask 채팅 UI 단독 — AAH Studio 에서 만든 Agent 또는 Team 의 ARN 을 박으면
+    그 컨테이너를 호출. Studio Mode 결과물을 자체 운영 UI 로 노출하는 패턴.
+  domain: general
+  tags: [ui-only, studio, sample]
+
+services:
+  - id: ui
+    kind: web_service
+    target: app_runner
+    dockerfile: ./services/ui/Dockerfile
+    port: 8000
+    health_path: /healthz
+    requirements:
+      cpu: "0.25 vCPU"
+      memory: "0.5 GB"
+      min_instances: 1
+      max_instances: 4
+
+# UI 외부에 의존하지 않음 — 리소스 항목 없음.
+resources: []
+
+env_by_service:
+  ui:
+    - { name: AGENT_RUNTIME_ARN, default: "" }   # 필수 — Studio Agent/Team baked ARN
+    - { name: AWS_REGION,        default: "us-east-1" }
+    - { name: UI_TITLE,          default: "AAH Studio Chat" }
+    - { name: LOG_LEVEL,         default: "INFO" }
